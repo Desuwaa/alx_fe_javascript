@@ -167,7 +167,7 @@ const importFromJsonFile = function (event) {
 };
 
 // ====== Server Sync Simulation ======
-const fetchServerQuotes = async function () {
+const fetchQuotesFromServer = async function () {
   const response = await fetch(
     'https://jsonplaceholder.typicode.com/posts?_limit=5'
   );
@@ -193,10 +193,9 @@ const syncWithServer = async function () {
   try {
     syncStatus.textContent = 'Syncing with server...';
 
-    const serverQuotes = await fetchServerQuotes();
+    const serverQuotes = await fetchQuotesFromServer();
     const serverTexts = serverQuotes.map((q) => q.text);
 
-    // Conflict Resolution: keep local quotes that are not in server
     const newLocalQuotes = quotes.filter((q) => !serverTexts.includes(q.text));
     quotes = [...serverQuotes, ...newLocalQuotes];
 
@@ -217,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadLastQuote();
 
   newQuoteBtn.addEventListener('click', showRandomQuote);
-  exportBtn.addEventListener('click', exportToJsonFile);
-  importFile.addEventListener('change', importFromJsonFile);
-  syncBtn.addEventListener('click', syncWithServer);
+  exportBtn?.addEventListener('click', exportToJsonFile);
+  importFile?.addEventListener('change', importFromJsonFile);
+  syncBtn?.addEventListener('click', syncWithServer);
 });
