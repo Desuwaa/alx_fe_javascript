@@ -219,4 +219,5 @@ document.addEventListener('DOMContentLoaded', () => {
   exportBtn?.addEventListener('click', exportToJsonFile);
   importFile?.addEventListener('change', importFromJsonFile);
   syncBtn?.addEventListener('click', syncQuotes);
+  setInterval(syncQuotes, 30000); // every 30 seconds
 });
