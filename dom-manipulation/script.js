@@ -202,7 +202,7 @@ const syncQuotes = async function () {
     saveQuotes();
     populateCategories();
 
-    syncStatus.textContent = 'Sync complete. Server quotes synced.';
+    syncStatus.textContent = 'Quotes synced with server!';
   } catch (err) {
     syncStatus.textContent = 'Error syncing with server.';
     console.error(err);
