@@ -328,12 +328,23 @@ const quotes = [
 const makeSpan = function (cls, text) {
   const spanEl = document.createElement('span');
   spanEl.classList.add(cls);
-  spanEl.textContent = text;
+  spanEl.innerHTML = text;
   return spanEl;
 };
 
+const showRandomQuote = function () {
+  return quotes[Math.floor(Math.random() * quotes.length)];
+
+  //   quoteDisplay.replaceChildren(
+  //     makeSpan('category', `[${randomQuote.category}]`),
+  //     makeSpan('quote-text', ` : ${randomQuote.text}`)
+  //   );
+
+  //   quoteDisplay.classList.add('show');
+};
+
 const displayRandomQuote = function () {
-  const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+  const randomQuote = showRandomQuote();
 
   quoteDisplay.replaceChildren(
     makeSpan('category', `[${randomQuote.category}]`),
