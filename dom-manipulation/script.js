@@ -189,7 +189,7 @@ const pushQuoteToServer = async function (quote) {
   return data;
 };
 
-const syncWithServer = async function () {
+const syncQuotes = async function () {
   try {
     syncStatus.textContent = 'Syncing with server...';
 
@@ -218,5 +218,5 @@ document.addEventListener('DOMContentLoaded', () => {
   newQuoteBtn.addEventListener('click', showRandomQuote);
   exportBtn?.addEventListener('click', exportToJsonFile);
   importFile?.addEventListener('change', importFromJsonFile);
-  syncBtn?.addEventListener('click', syncWithServer);
+  syncBtn?.addEventListener('click', syncQuotes);
 });
