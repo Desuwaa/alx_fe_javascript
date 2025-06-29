@@ -354,13 +354,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 const addQuote = function () {
-  //   quoteDisplay.replaceChildren(
-  //     makeSpan('category', `[${userCategory.value}]`),
-  //     makeSpan('quote-text', ` : ${userText.value}`)
-  //   );
   quoteDisplay.replaceChildren();
-  quoteDisplay.appendChild = makeSpan('category', `[${userCategory.value}]`);
-  quoteDisplay.appendChild = makeSpan('quote-text', ` : ${userText.value}`);
+
+  quoteDisplay.appendChild(makeSpan('category', `[${userCategory.value}]`));
+  quoteDisplay.appendChild(makeSpan('quote-text', ` : ${userText.value}`));
 
   const newQuote = {
     text: userText.value,
