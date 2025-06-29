@@ -8,11 +8,10 @@ const quoteDisplay = document.getElementById('quoteDisplay');
 const userText = document.getElementById('newQuoteText');
 const userCategory = document.getElementById('newQuoteCategory');
 const categoryFilter = document.getElementById('categoryFilter');
-const syncBtn = document.getElementById('syncBtn');
-const syncStatus = document.getElementById('syncStatus');
 
 let quotes = [];
 
+// Default fallback quotes
 const defaultQuotes = [
   {
     text: 'The only way to do great work is to love what you do.',
@@ -26,20 +25,23 @@ const defaultQuotes = [
   },
 ];
 
-// ====== Storage Functions ======
+// Load quotes from localStorage or use defaults
 const loadQuotes = function () {
   const storedQuotes = localStorage.getItem('quotes');
   quotes = storedQuotes ? JSON.parse(storedQuotes) : [...defaultQuotes];
 };
 
+// Save quotes to localStorage
 const saveQuotes = function () {
   localStorage.setItem('quotes', JSON.stringify(quotes));
 };
 
+// Save last viewed quote in sessionStorage
 const saveLastQuote = function (quote) {
   sessionStorage.setItem('lastQuote', JSON.stringify(quote));
 };
 
+// Load last viewed quote from sessionStorage
 const loadLastQuote = function () {
   const last = sessionStorage.getItem('lastQuote');
   if (last) {
@@ -52,7 +54,7 @@ const loadLastQuote = function () {
   }
 };
 
-// ====== Display & UI ======
+// Create a styled <span>
 const makeSpan = function (cls, text) {
   const spanEl = document.createElement('span');
   spanEl.classList.add(cls);
@@ -60,21 +62,23 @@ const makeSpan = function (cls, text) {
   return spanEl;
 };
 
+// Show a random quote from full list
+const showRandomQuote = function () {
+  const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+  displayQuote(randomQuote);
+  saveLastQuote(randomQuote);
+};
+
+// Display a quote on the page
 const displayQuote = function (quote) {
   quoteDisplay.replaceChildren(
     makeSpan('category', `[${quote.category}]`),
     makeSpan('quote-text', ` : ${quote.text}`)
   );
   quoteDisplay.classList.add('show');
-  saveLastQuote(quote);
 };
 
-const showRandomQuote = function () {
-  const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-  displayQuote(randomQuote);
-};
-
-// ====== Category Filter ======
+// Populate unique categories into dropdown
 const populateCategories = function () {
   const uniqueCategories = [...new Set(quotes.map((q) => q.category))];
   categoryFilter.innerHTML = '<option value="all">All Categories</option>';
@@ -89,10 +93,11 @@ const populateCategories = function () {
   const savedFilter = localStorage.getItem('selectedCategory');
   if (savedFilter) {
     categoryFilter.value = savedFilter;
-    filterQuotes();
+    filterQuotes(); // Apply the saved filter
   }
 };
 
+// Filter and show quotes by selected category
 const filterQuotes = function () {
   const selectedCategory = categoryFilter.value;
   localStorage.setItem('selectedCategory', selectedCategory);
@@ -109,9 +114,10 @@ const filterQuotes = function () {
 
   const randomQuote = filtered[Math.floor(Math.random() * filtered.length)];
   displayQuote(randomQuote);
+  saveLastQuote(randomQuote);
 };
 
-// ====== Add Quote ======
+// Add a new quote from user input
 const addQuote = function () {
   if (!userText.value.trim() || !userCategory.value.trim()) {
     alert('Please enter both quote and category.');
@@ -127,12 +133,13 @@ const addQuote = function () {
   saveQuotes();
   populateCategories();
   displayQuote(newQuote);
+  saveLastQuote(newQuote);
 
-  userText.value = '';
   userCategory.value = '';
+  userText.value = '';
 };
 
-// ====== Export & Import ======
+// Export quotes to downloadable JSON file
 const exportToJsonFile = function () {
   const blob = new Blob([JSON.stringify(quotes, null, 2)], {
     type: 'application/json',
@@ -147,6 +154,7 @@ const exportToJsonFile = function () {
   document.body.removeChild(a);
 };
 
+// Import quotes from uploaded JSON file
 const importFromJsonFile = function (event) {
   const fileReader = new FileReader();
   fileReader.onload = function (e) {
@@ -166,51 +174,7 @@ const importFromJsonFile = function (event) {
   fileReader.readAsText(event.target.files[0]);
 };
 
-// ====== Server Sync Simulation ======
-const fetchServerQuotes = async function () {
-  const response = await fetch(
-    'https://jsonplaceholder.typicode.com/posts?_limit=5'
-  );
-  const serverData = await response.json();
-
-  return serverData.map((post) => ({
-    text: post.title,
-    category: 'Server',
-  }));
-};
-
-const pushQuoteToServer = async function (quote) {
-  const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
-    method: 'POST',
-    body: JSON.stringify(quote),
-    headers: { 'Content-Type': 'application/json; charset=UTF-8' },
-  });
-  const data = await response.json();
-  return data;
-};
-
-const syncWithServer = async function () {
-  try {
-    syncStatus.textContent = 'Syncing with server...';
-
-    const serverQuotes = await fetchServerQuotes();
-    const serverTexts = serverQuotes.map((q) => q.text);
-
-    // Conflict Resolution: keep local quotes that are not in server
-    const newLocalQuotes = quotes.filter((q) => !serverTexts.includes(q.text));
-    quotes = [...serverQuotes, ...newLocalQuotes];
-
-    saveQuotes();
-    populateCategories();
-
-    syncStatus.textContent = 'Sync complete. Server quotes synced.';
-  } catch (err) {
-    syncStatus.textContent = 'Error syncing with server.';
-    console.error(err);
-  }
-};
-
-// ====== Initialize ======
+// Initialize app
 document.addEventListener('DOMContentLoaded', () => {
   loadQuotes();
   populateCategories();
@@ -219,5 +183,4 @@ document.addEventListener('DOMContentLoaded', () => {
   newQuoteBtn.addEventListener('click', showRandomQuote);
   exportBtn.addEventListener('click', exportToJsonFile);
   importFile.addEventListener('change', importFromJsonFile);
-  syncBtn.addEventListener('click', syncWithServer);
 });
